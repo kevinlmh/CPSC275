@@ -1,0 +1,71 @@
+/*
+ * File: p9-2a.txt
+ * Author: Kevin Liu
+ * Date: Nov 21 2014
+ */
+
+Here is my solution in C code:
+
+/***************************** Start of C code ********************************/
+
+/* Global variables */
+int readcnt, writecnt;	/* Initially = 0 */
+sem_t mutex, rcnt_mutex, wcnt_mutex, r, w;	/* All initially = 1 */
+
+void reader(void) {
+	while (1) {
+		P(&rcnt_mutex);
+			readcnt++;
+			if (readcnt == 1)
+				P(&w);
+		V(&rcnt_mutex);
+		
+		P(&r);
+			/* Critical section */
+			/* Reading happens */
+		V(&r);
+
+		P(&rcnt_mutex);
+			readcnt--;
+			if (readcnt == 0)
+				V(&w);
+		V(&rcnt_mutex);
+	}
+}
+
+void writer(void) {
+	P(&mutex);
+		P(&w);
+			P(&wcnt_mutex);
+				writecnt++;
+				if (writecnt == 1)
+					P(&r);
+			V(&wcnt_mutex);
+		V(&w);
+	V(&mutex):
+
+	/* Critical section */
+	/* Writing happens */
+	
+	P(&wcnt_mutex);
+		writecnt--;
+		if (writecnt == 0)
+			V(&r);
+	V(&wcnt_mutex);		
+}
+
+/******************************* End of C code ********************************/
+
+The semaphore r protects the reading operation, w protects the writing 
+operation, rcnt_mutex protects the readcnt variable and wcnt_mutex protects the 
+writecnt variable. In this solution, the first reader to pass P(&w) will block 
+writers from entering the section which manipulates wcnt_mutex and r. mutex is 
+needed because without mutex, we have the possibility that a reader and many 
+writers will be simultanueously waiting for a V(&w) to be done by a writer. Then
+we could not guarantee priority to the reader. By adding another semaphore 
+mutex, we can guarantee that a writer has exclusive access to the block of code 
+from P(&w) to V(&w). As a result there will be at most one process waiting at w 
+and that process is guaranteed priority at V(&w).
+
+
+

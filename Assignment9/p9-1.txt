@@ -1,0 +1,60 @@
+/*
+ * File: p9-1.txt
+ * Author: Kevin Liu
+ * Date: Nov 19 2014
+ */
+
+Here is the solution in C:
+
+/****************************** Start of C code ******************************/
+
+#include "csapp.h"
+#include "sbuf.h"
+
+/* Create an empty, bounded, shared FIFO buffer with n slots */
+void sbuf_init(sbuf_t *sp, int n) {
+	sp->buf = Calloc(n, sizeof(int));
+	sp->n = n;								/* Buffer holds max of n items */
+	sp->front = sp->rear = 0;				/* Empty buffer iff front == rear */
+	Sem_init(&sp->mutex, 0, 1);				/* Binary semaphore for locking */
+	Sem_init(&sp->slots, 0, n);				/* Initially, buf has n empty slots */
+	Sem_init(&sp->items, 0, 0);				/* Initially, buf has zero data items */
+}
+
+/* Clean up buffer sp */
+void sbuf_deinit(sbuf_t *sp) {
+	Free(sp->buf);
+}
+
+/* Insert item onto the rear of shared buffer sp */
+void sbuf_insert(sbuf_t *sp, int item) {
+	P(&sp->slots);							/* Wait for available slot */
+	P(&sp->mutex);							/* Lock the buffer */
+	sp->buf[(++sp->rear)%(sp->n)] = item;	/* Insert the item */
+	V(&sp->mutex);							/* Unlock the buffer */
+	V(&sp->items);							/* Announce available item */
+}
+
+/* Remove and return the first item from buffer sp */
+int sbuf_remove(sbuf_t *sp) {
+	int item;								/* Wait for available item */
+	P(&sp->items);							/* Lock the buffer */
+	P(&sp->mutex);							/* Remove the item */
+	item = sp->buf[(++sp->front)%(sp->n)];	/* Unlock the buffer */
+	V(&sp->mutex);							/* Announce available slot */
+	V(&sp->slots);
+	return item;
+}
+
+/******************************** End of C code *******************************/
+
+The solution given in the textbook works for the case of multiple producers and 
+consumers. Consumers check for available items and producers check for empty 
+slots. If a consumer found an available item or a producer found an empty slot, 
+it locks the semephore "mutex". Since mutex is a binary semaphore, there can be 
+only one producer or consumer accessing the buffer at a time. This guarentees a 
+process exlusive access to the buffer. So in a scenario with multiple producers 
+and consumers, the code above will work.
+
+
+

@@ -1,0 +1,14 @@
+/* File: p2-72.txt
+ * Author: Kevin Liu
+ * Data: Oct 6 2014
+ */
+
+A. The sizeof operator returns a value of type size_t, which is unsigned integer. However the argument 'maxbytes' is a signed integer. When we do arithmatic with one signed and one unsinged integer, the result is always treated as unsigned. So "maxbytes-sizeof(val)", which was supposed to be a negative number, is interpreted as a large positive number. So the conditional test is always true.
+
+B. Here is the modified code:
+	void copy_int_corrected(int val, void *buf, int maxbytes) {
+		if (maxbytes - (int)sizeof(val) >= 0)
+			memcpy(buf, (void *)&val, sizeof(val));
+	}
+
+By casting sizeof(val) into a signed integer, "maxbytes-(int)sizeof(val)" will be treated as signed integer after evaluation, and therefore the conditional test will work properly.

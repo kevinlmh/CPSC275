@@ -1,0 +1,36 @@
+/* File: p2-75.txt
+ * Author: Kevin Liu
+ * Data: Oct 6 2014
+ */
+
+Here is my solution:
+
+define w the_num_of_bits_of_unsigned
+
+unsigned int unsigned_high_prod(unsinged x, unsigned y) {
+		unsigned xh, xl, yh, yl;
+		x_msb = x / (1 << (w-1));		// x_msb
+		y_msb = x / (1 << (w-1));		// y_msb
+		xl = x ^ xh;								// lower w-1 bits of x
+		yl = y ^ yh;								// lower w-1 bits of y
+		return (signed_high_prod(x, y) + y_msb * xl + x_msb * yl);
+} // end of function
+
+Proof of correctness:
+		Let x and y be signed integers and xu yu be their value in unsigned. x_msb is the most significant bit of x and y_msb is the most significant bit of y. xl is the lower w-1 bits of x and yl is the lower w-1 bits of y.
+ 
+		We know that:
+				x = x_msb * (-2^(w-1)) + xl 
+				y = y_msb * (-2^(w-1)) + yl
+				xu = x_msb * 2^(w-1) + xl
+				yu = y_msb * 2^(w-1) + yl
+		
+		Then:
+				unsigned_high_prod - signed_high_prod
+				= (xu * yu - x * y) / 2^w
+				= ( (x_msb * (2^(w-1)) + xl) * (y_msb * 2^(w-1) + yl) - (x_msb * (-2^(w-1)) + xl) * (y_msb * (-2^(w-1))) ) / 2^w
+				= x_msb * yl + y_msb * xl
+
+		Therefore:
+				unsigned_high_prod = signed_high_prod + x_msb * yl + y_msb * xl
+		the solution is correct.

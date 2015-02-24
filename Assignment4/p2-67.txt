@@ -1,0 +1,36 @@
+/* File: p2-67.txt
+ * Author: Kevin Liu
+ * Data: Oct 6 2014
+ */
+
+A. The given code right-shifted the constant one 32 bits, which is equal to the size of an integer on a 32-bit system. Shifting the amount equal to the size of the data type is not allowed in C.
+
+B. Here is the modified code: 
+	/* The following code will work on any machine for which int >= 32 bits */
+	int int_size_is_32() {
+		/* Set most significant bit (msb) of 32-bit machine */
+		int set_msb = 1 << 31;
+		/* Shift past msb of 32-bit word */
+		int beyond_msb = (1 << 31) << 1;
+
+		/* set_msb is non-zero when word size >= 32
+		   beyond_msb is zero when word size >= 32 */
+		return set_msb && !beyond_msb;
+	}
+
+By breaking up the shift, we still shift one 32 bits to the left but bypass the restriction of C standard.
+
+C. Here is the modifed code:
+	/* The following code will work on any machine for which int >= 16 bits */
+	int int_size_is_32_16compatible() {
+		/* Set most significant bit (msb) of 32-bit machine */
+		int set_msb = (0x8000) << 15;
+		/* Shift past msb of 32-bit word */
+		int beyond_msb = (0x8000 << 15) << 1;
+
+		/* set_msb is non-zero when word size >= 32
+		   beyond_msb is zero when word sie >= 32 */
+		return set_msb && !beyond_msb;
+	}
+
+0x8000 is equal to 1000000000000000B on any machine for which data type int is at least 16 bits. Therefore shifting 0x8000 15 bits to the left will set the most significan bit if the code is running on a 32-bit machine. Similarly shifting 0x8000 16 bits to the left will result in an overflow and beyond_msb will be 0 on a 32-bit machine ( note that I break up the shift into 15 and 1 to bypass the restriction of C). 

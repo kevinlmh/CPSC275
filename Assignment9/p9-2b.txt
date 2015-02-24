@@ -1,0 +1,57 @@
+/*
+ * File: p9-2b.txt
+ * Author: Kevin Liu
+ * Date: Nov 21 2014
+ */
+
+A fair solution in C code:
+
+/********************************* Begin C code *******************************/
+
+/* Global variables */
+sem_t mutex;	/* Initially = 1 */
+set_t access;	/* Initially = N */
+
+void reader(void) {
+	while (1) {
+		P(&access);
+
+		/* Critical section */
+		/* Reading happens */
+		
+		V(&access);		
+	}
+}
+
+void writer(void) {
+	while (1) {
+		P(&mutex);
+		int k;
+		for (k = 0; k < N; k++)
+			P(&access);
+		
+		/* Critical section */
+		/* Writing happens */
+
+		for (k = 0; k < n; k++)
+			V(&access);
+		V(&mutex);
+	}
+}
+
+/********************************* End of C code ******************************/
+
+In this solution only one binary semaphore 'mutex' and one counting semaphore 
+'access' are used. Everytime a reader wants to enter the critical section and 
+read from the shared resource it decrements 'access' and everytime a reader 
+leaves critical section it increments 'access'. In this way N readers can have 
+simultaneous access to the shared resource. When a writer wants to enter the 
+critical section, it occupies 'access' step by step, waiting for old readers to 
+leave the critical section while denying entrace to new readers by incrementing 
+'access'. However if two writers want to enter the critical section at the same 
+time and each occupies half of 'access', then a deadlock will occur. To prevent 
+the deadlock, 'mutex' is neccessary. 'mutex' guarentees that only one writer is 
+trying to enter the critical section. 
+
+
+

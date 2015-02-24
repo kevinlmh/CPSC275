@@ -1,0 +1,6 @@
+Public speaking is very easy.
+0 1 1 2 3 5
+0 g 669
+13 31
+5 115
+4 2 1 6 3 5

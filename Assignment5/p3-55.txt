@@ -1,0 +1,28 @@
+/*
+ * CPSC-275 Assignment 5 Problem 2
+ * Author: Kevin Liu
+ * Date: Oct 12 2014
+ */
+
+Solution:
+	Algorithm:
+	Let x denote the value of variable x, and let y denote the value of y, which we can write as y = yh * 2^32 + yl, where yh and yl are the values represented by the high- and low-order 32 bits, respectively. We can therefore compute x * y = x * yh * 2^32 + x * yl. The full representation of the product would be 96 bits long, but we require only the low-order 64 bits. We can therefore let s be te low-order 32 bits of x * yh and t be the full 64-bit product x * yl, which we can split into hith- and low-order parts th and tl. The final result has tl as the low-order part, and s + th as the high-order part. 
+	Recall that the low-order 32 bits of signed and unsigned integer multiplication products are the same, so the sign of x will not affect s or tl but will affect th. Therefore th = s + w * yl + high-order 32 bits of x * yl, where w is 0 if x >=0, -1 if x < 0. 
+	
+	Annotated assembly code:
+
+	movl	16(%ebp), %esi		# load yl
+	movl	12(%ebp), %eax		# load x
+	movl	%eax ,%edx			# make a copy of x in edx
+	sarl	$31, %edx			# x >> 31(0 if x>=0, -1 if x<0)
+	movl	20(%ebp), %ecx		# load yh
+	imull	%eax, %ecx			# x * yh which is s
+	movl	%edx, %ebx			# copy x >> 31 to ebx
+	imull	%esi, %ebx			# (x >> 31) * yl
+	addl	%ebx, %ecx			# s + (x >> 31) * yl
+	mull	%esi				# now %eax is low-order 32 bits of x * yl which is tl
+								# %edx is high-order 32 bits of x * yl
+	leal	(%ecx,%edx), %edx	# s + (x >> 31) * yl + high-order 32 bits of x * yl
+	movl	8(%ebp), %ecx		# load address of destination
+	movl	%eax, (%ecx)		# store low-order part of x * y
+	movl	%edx, 4(%ecx)		# store high-order part of x * y

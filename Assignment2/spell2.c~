@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+char *spell_three_digits(int x) {
+	char string[100];
+   	if (x < 10)
+    	return ones[x];
+   	else if (x < 20)
+    	return teens[x - 10];
+   	else if (x < 100) {
+    	if (x % 10 == 0)
+        	return tens[x / 10];
+    	else {
+    		//return tens[x / 10] + "-" + ones[x % 10];
+			mystrcat(string, tens[x / 10]);
+			mystrcat(string, " ");
+			mystrcat(string, ones[x % 10]);
+			return string;
+		}
+	}
+	else if (x < 1000) {
+		if (x % 100 == 0) {
+			//return ones[x / 100] + hundred;
+			mystrcat(string, ones[x / 100]);
+			mystrcat(string, hundred);
+			return string;
+		}
+		else {
+			//return ones[x / 100] + hundred + " " + spellout(x % 100);
+			mystrcat(string, ones[x / 100]);
+			mystrcat(string, hundred);
+			mystrcat(string, " ");
+			spellout(x % 100);
+			return string;
+		}
+   }
+}

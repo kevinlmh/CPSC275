@@ -1,0 +1,10 @@
+/* 
+ * CPSC-275 Assignment 5 Problem 1
+ * Author: Kevin Liu
+ * Date: Oct 10 2014
+ */
+
+Solution:
+	int decode2(int x, int y, int z) {
+		return (x*(y-z)) ^ (((y-z)<<31)>>31);
+	}
